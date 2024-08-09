@@ -10,14 +10,30 @@ use proyecto\Response\Failure;
 use proyecto\Response\Success;
 use proyecto\Controller\PersonasController;
 use proyecto\Controller\EmpleadosController;
-Router::headers();
+use proyecto\Controller\VehiculosController;
+use PDO;
 
 
+Router::post('/empleado',[EmpleadosController::class,'register']);
 
-Router::get('/prueba',[PersonasController::class,'mostarpersonas']);
+Router::post('/vehiculos',[VehiculosController::class,'register']);
+
+Router::post('/citas',[PersonasController::class,'registercita']);
+
+Router::post('/ingresaempleado', [EmpleadosController::class, "registroempleado"]);
+
+Router::put('/actualizarclientes',[PersonasController::class,'ActualizarClientes']);
+
+Router::get('/personaid',[PersonasController::class,'buscarpersona']);
+
 Router::get('/clientes',[PersonasController::class,'mostrarclientes']);
+
+Router::get('/empleados',[EmpleadosController::class,'mostrarempleados']);
+
+Router::get('/vehiculos',[VehiculosController::class,'mostrarvehiculos']);
+
 Router::get('/crearpersona', [crearPersonaController::class, "crearPersona"]);
-Router::post('/ingresacliente', [EmpleadosController::class, "registroempleado"]);
+
 Router::get('/usuario/buscar/$id', function ($id) {
 
     $user= User::find($id);

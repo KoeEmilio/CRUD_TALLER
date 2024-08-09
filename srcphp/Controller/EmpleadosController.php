@@ -2,54 +2,59 @@
 
 namespace proyecto\Controller;
 
+use proyecto\Models\Table;
 use proyecto\Models\Personas;
 use proyecto\Models\Empleados;
 use PDO;
 use PDOException;
+use proyecto\Response\Success;
 
 class EmpleadosController
 {
-    public function registroempleado()
-    {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $RFC = $_POST['RFC'];
-            $Numero_Seguro_Social = $_POST['Numero_Seguro_Social'];
-            $CURP = $_POST['CURP'];
-            $correo = $_POST['correo'];
-            $Fecha_Ingreso = $_POST['Fecha_Ingreso'];
-            $Nombre_Persona = $_POST['Persona_Empleado'];
-            $Estado = $_POST['Estado'];
 
-            try {
-                // Buscar el ID de la persona por nombre
-                $sql = "SELECT id FROM Personas WHERE Nombre = :Nombre";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':Nombre', $Nombre_Persona);
-                $stmt->execute();
-                $persona = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function mostrarempleados(){
+        
+        $tablaempleados= new Table();
+        $todoslosempleados = $tablaempleados -> query("SELECT personas.Nombre,personas.Telefono,personas.Correo,personas.Direccion,empleados.Estado,
+        COUNT(orden_servicio.OrdenID) AS Ordenes_Pendientes
+        FROM Empleados 
+        INNER JOIN Personas  ON empleados.Persona_Empleado = personas.PersonaID
+        LEFT JOIN Orden_Servicio  ON empleados.EmpleadoID = orden_servicio.Empleado_Que_Atendera 
+        where orden_servicio.Estado = 'Pendiente'
+        GROUP BY empleados.EmpleadoID, personas.Nombre, personas.Telefono, personas.Correo, personas.Direccion, empleados.Estado;");
+        
+        $success = new Success($todoslosempleados);
+        return $success -> send();
+    }
 
-                if (!$persona) {
-                    echo "Error: Persona no encontrada.";
-                    return;
-                }
+    public function register(){
 
-                $Persona_Empleado_ID = $persona['id'];
+        $JSONData = file_get_contents("php://input");
+        $dataObject = json_decode($JSONData);
 
-                // Insertar el nuevo empleado
-                $sql = "INSERT INTO Empleados (RFC, Numero_Seguro_Social, CURP, correo, Fecha_Ingreso, Persona_Empleado, Estado) VALUES (:RFC, :Numero_Seguro_Social, :CURP, :correo, :Fecha_Ingreso, :Persona_Empleado, :Estado)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':RFC', $RFC);
-                $stmt->bindParam(':Numero_Seguro_Social', $Numero_Seguro_Social);
-                $stmt->bindParam(':CURP', $CURP);
-                $stmt->bindParam(':correo', $correo);
-                $stmt->bindParam(':Fecha_Ingreso', $Fecha_Ingreso);
-                $stmt->bindParam(':Persona_Empleado', $Persona_Empleado_ID); // Usar el ID de la persona
-                $stmt->bindParam(':Estado', $Estado);
-                $stmt->execute();
-                echo "Empleado insertado correctamente.";
-            } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
-            }
-        }
+        $newPersona = new Personas();
+        $newPersona->PersonaID = $dataObject->PersonaID;
+        $newPersona->Nombre = $dataObject->Nombre;
+        $newPersona->Direccion = $dataObject->Direccion;
+        $newPersona->Telefono = $dataObject->Telefono;
+        $newPersona->Correo = $dataObject->Correo; // Asignar el nombre de usuario
+        $newPersona->save();
+
+        // Obtener el ID de la nueva persona creada
+        $personaID = $newPersona->PersonaID;
+
+        $newEmpleado = new Empleados();
+        $newEmpleado->EmpleadoID = $dataObject->EmpleadoID; // Asignar el ID del empleado
+        $newEmpleado->RFC = $dataObject->RFC;
+        $newEmpleado->Num_Seguro_Social = $dataObject->Num_Seguro_Social;
+        $newEmpleado->CURP = $dataObject->CURP;
+        $newEmpleado->Persona_Empleado = $personaID; // Asignar el ID de la persona recién creada
+        $newEmpleado->Estado = $dataObject -> Estado; 
+        $newEmpleado->save();
+
+    
+
+        // Devolver los datos del nuevo empleado
+        return (new Success($newEmpleado))->Send();
     }
 }

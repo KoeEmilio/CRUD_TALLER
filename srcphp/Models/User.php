@@ -50,7 +50,7 @@ class User extends Models
         if ($resultados) {
 //            Auth::setUser($resultados[0]);  pendiente
             $r=new Success(["usuario"=>$resultados[0],"_token"=>Auth::generateToken([$resultados[0]->id])]);
-           return  $r->Send();
+        return  $r->Send();
         }
         $r=new Failure(401,"Usuario o contraseña incorrectos");
         return $r->Send();
