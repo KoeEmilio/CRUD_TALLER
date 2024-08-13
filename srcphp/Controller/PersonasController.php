@@ -7,6 +7,7 @@ use proyecto\Response\Success;
 use proyecto\Models\Clientes;
 use proyecto\Models\Citas;
 use proyecto\Models\Table;
+use proyecto\Models\Pagos;
 
 Class PersonasController{
 
@@ -22,10 +23,10 @@ Class PersonasController{
     public function mostrarclientes(){
         
         $tablapersona= new Table();
-        $todaslaspersonas = $tablapersona -> query("select personas.PersonaID as ID, personas.nombre as Nombre, personas.Correo  as Correo, personas.Telefono as Telefono,
-        clientes.tipo_cliente as Tipo_De_Cliente
-        from personas
-        inner join clientes on personas.personaID = clientes.PersonaID");
+        $todaslaspersonas = $tablapersona -> query("select Personas.PersonaID , Personas.Nombre , Personas.Correo , Personas.Telefono,
+        Clientes.Tipo_Cliente
+        from Personas
+        inner join Clientes on Personas.PersonaID = Clientes.PersonaID");
         
         $success = new Success($todaslaspersonas);
         return $success -> send();
@@ -76,15 +77,6 @@ Class PersonasController{
             return json_encode(['error' => 'Error de conexión: ' . $e->getMessage()]);
         }
     }
-    
-    
-    public function buscarpersona($PersonaID){
-        $stmt = $this->PDO()->prepare("SELECT * FROM personas WHERE PersonaID = :PersonaID");
-        $stmt->bindParam(':PersonaID', $PersonaID);
-        $stmt->execute();
-        $persona = $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
 
     public function registercita()
     {
@@ -105,7 +97,11 @@ Class PersonasController{
         return (new Success($newCita))->Send();
 }
 
-    
+    public function mostrarpagos(){
+    $pagos = Pagos::all();
 
-    
+    $success = new Success($pagos);
+    return $success -> send();
+
+    }
 }

@@ -3,7 +3,6 @@
 class Usuario extends Models
 {
     protected $fillable = [
-        'PersonaID',
         'Usuario',
         'Contraseña'
     ];

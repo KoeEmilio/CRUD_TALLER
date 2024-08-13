@@ -16,7 +16,7 @@ use PDO;
 
 Router::post('/empleado',[EmpleadosController::class,'register']);
 
-Router::post('/vehiculos',[VehiculosController::class,'register']);
+Router::post('/registrovehiculos',[VehiculosController::class,'register']);
 
 Router::post('/citas',[PersonasController::class,'registercita']);
 
@@ -29,6 +29,8 @@ Router::get('/personaid',[PersonasController::class,'buscarpersona']);
 Router::get('/clientes',[PersonasController::class,'mostrarclientes']);
 
 Router::get('/empleados',[EmpleadosController::class,'mostrarempleados']);
+
+Router::get('/pagos',[PersonasController::class,'mostrarpagos']);
 
 Router::get('/vehiculos',[VehiculosController::class,'mostrarvehiculos']);
 

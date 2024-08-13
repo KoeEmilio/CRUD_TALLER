@@ -17,10 +17,7 @@
          */
         protected $filleable = ["nombre", "edad", "apellido_paterno", "apellido_materno"];
         protected $table = "personas";
-        public $nombre = "";
-        public $edad = "";
-        public $apellido_paterno = "";
-        public $apellido_materno = "";
+        
 
 
         public function PersonaMayores($edad){

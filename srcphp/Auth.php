@@ -14,7 +14,7 @@ class Auth
     public static function generateToken($data, $time = 3600): string
     {
         $t = Carbon::now()->timestamp + $time;
-        $key = 'orimar174';
+        $key = 'Oliver';
         $payload = ['exp' => $t, 'data' => $data];
         return JWT::encode($payload, $key, 'HS256');
     }
@@ -24,7 +24,7 @@ class Auth
      */
     public static function getUser()
     {
-        $secretKey = 'orimar174';
+        $secretKey = 'Oliver';
         $jwt = Router::getBearerToken();
         $token = JWT::decode($jwt, new key($secretKey, 'HS256'));
         return User::find($token->data[0]);
